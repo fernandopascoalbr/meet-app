@@ -1,17 +1,19 @@
 import { constants } from '../../shared/constants.js'
+import UserDb from '../../shared/userDb.js'
 import LobbyController from './controller.js'
 import LobbySocketBuilder from './util/lobbySocketBuilder.js'
 import View from './view.js'
+
+const user = UserDb.get()
+
+if (!user.username || !user.img) {
+  View.redirectToLogin()
+}
 
 const socketBuilder = new LobbySocketBuilder({
   socketUrl: constants.socketUrl,
   namespace: constants.socketNamespaces.lobby,
 })
-
-const user = {
-  img: 'https://cdn4.iconfinder.com/data/icons/avatars-xmas-giveaway/128/batman_hero_avatar_comics-128.png',
-  username: 'Fernando ' + Date.now(),
-}
 
 const dependencies = {
   socketBuilder,
@@ -19,4 +21,6 @@ const dependencies = {
   view: View,
 }
 
-await LobbyController.initialize(dependencies)
+LobbyController.initialize(dependencies).catch((err) =>
+  alert(err?.message || '')
+)

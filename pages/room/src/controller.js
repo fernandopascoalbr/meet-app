@@ -24,6 +24,19 @@ export default class RoomController {
   _setupViewEvent() {
     this.view.updateUserImage(this.roomInfo.user)
     this.view.updateTopicTitle(this.roomInfo.room)
+    this.view.configureLeaveButton()
+    this.view.configureOnMicrophoneActivation(
+      this.onMicrophoneActivation.bind(this)
+    )
+    this.view.configureClapButton(this.onClapPressed.bind(this))
+  }
+
+  async onMicrophoneActivation() {
+    await this.roomService.toggleAudioActivation()
+  }
+
+  onClapPressed() {
+    this.socket.emit(constants.events.SPEAK_REQUEST, this.roomInfo.user)
   }
 
   async _setupWebRTC() {
@@ -67,7 +80,21 @@ export default class RoomController {
       .setOnUserDisconnected(this.onUserDisconnected.bind(this))
       .setOnRoomUpdated(this.onRoomUpdated.bind(this))
       .setOnUserProfileUpgrade(this.onUserProfileUpgrade.bind(this))
+      .setOnSpeakRequested(this.onSpeakRequested.bind(this))
       .build()
+  }
+
+  onSpeakRequested(data) {
+    const attendee = new Attendee(data)
+    const result = prompt(
+      `O usuário ${attendee.username} pediu para falar, deseja aceitar? 1: sim, 0: não`
+    )
+    const answer = Number(result)
+    this.socket.emit(constants.events.SPEAK_ANSWER, {
+      answer: Boolean(answer),
+      user: attendee,
+    })
+    console.log('request speaker', data)
   }
 
   onPeerError(error) {
@@ -83,9 +110,9 @@ export default class RoomController {
   onUserProfileUpgrade(data) {
     const attendee = new Attendee(data)
     console.log('onUserProfileUpgrade', data)
-    this.roomService.upgradeUserPermission(attendee)
 
     if (attendee.isSpeaker) {
+      this.roomService.upgradeUserPermission(attendee)
       this.view.addAttendeeOnGrid(data, true)
     }
 

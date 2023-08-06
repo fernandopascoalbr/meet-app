@@ -1,3 +1,4 @@
+import { constants } from '../../shared/constants.js'
 import Room from './entities/room.js'
 import getTemplate from './templates/lobbyItem.js'
 
@@ -7,6 +8,7 @@ const btnCreateRoomWithoutTopic = document.getElementById(
   'btnCreateRoomWithoutTopic'
 )
 const txtTopic = document.getElementById('txtTopic')
+const imgUser = document.getElementById('imgUser')
 
 export default class View {
   static updateUserImage({ img, username }) {
@@ -20,6 +22,10 @@ export default class View {
 
   static generateRoomLink({ id, topic }) {
     return `./../room/index.html?id=${id}&topic=${topic}`
+  }
+
+  static redirectToLogin() {
+    window.location = constants.pages.login
   }
 
   static redirectToRoom(topic = '') {
