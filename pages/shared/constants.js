@@ -1,16 +1,17 @@
 export const constants = {
-  socketUrl: 'http://192.168.0.13:3000',
+  // socketUrl: 'http://192.168.0.13:3000',
+  socketUrl: 'https://meet-server-9e5250798ce0.herokuapp.com',
   socketNamespaces: {
     room: 'room',
     lobby: 'lobby',
   },
   peerConfig: Object.values({
     id: undefined,
-    // config: {
-    //   port: 9000,
-    //   host: 'localhost',
-    //   path: '/'
-    // }
+    config: {
+      host: 'meet-peer-server-a062dd80579f.herokuapp.com',
+      path: '/',
+      secure: true,
+    },
   }),
   pages: {
     lobby: '/pages/lobby',
